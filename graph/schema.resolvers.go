@@ -5,13 +5,12 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"strconv"
-
 	"ent-graphql/ent"
 	"ent-graphql/ent/note"
 	"ent-graphql/graph/generated"
 	"ent-graphql/graph/model"
+	"fmt"
+	"strconv"
 )
 
 func (r *mutationResolver) CreateNote(ctx context.Context, input model.CreateNotePayload) (*model.Note, error) {
@@ -73,15 +72,15 @@ func (r *mutationResolver) DeleteNote(ctx context.Context, id string) (*model.De
 	return &model.DeleteNoteResponse{Success: true}, nil
 }
 
-func (r *queryResolver) Notes(ctx context.Context) ([]*model.Note, error) {
+func (r *queryResolver) Notes(ctx context.Context) ([]model.Note, error) {
 	notes, err := r.entClient.Note.Query().Order(ent.Desc(note.FieldCreateTime)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	var resultNotes []*model.Note
+	var resultNotes []model.Note
 	for _, n := range notes {
-		resultNotes = append(resultNotes, &model.Note{
+		resultNotes = append(resultNotes, model.Note{
 			ID:         strconv.Itoa(n.ID),
 			Body:       n.Body,
 			CreateTime: n.CreateTime,

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"net/http"
-	"os"
 
 	"ent-graphql/ent"
 	"ent-graphql/graph"
@@ -18,7 +17,7 @@ import (
 func main() {
 	client, err := ent.Open("postgres", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable")
 	if err != nil {
-		log.Fatalf("failed to open: %s", err)
+		log.Panicf("failed to open: %s", err)
 	}
 	defer client.Close()
 
@@ -26,18 +25,13 @@ func main() {
 		log.Panicf("failed creating schema resources: %v", err)
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
 		Resolvers: graph.NewResolver(client),
 	}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/graphql", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Println("connect to http://localhost:8080/ for GraphQL playground")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

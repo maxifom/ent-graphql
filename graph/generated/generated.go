@@ -73,7 +73,7 @@ type MutationResolver interface {
 	DeleteNote(ctx context.Context, id string) (*model.DeleteNoteResponse, error)
 }
 type QueryResolver interface {
-	Notes(ctx context.Context) ([]*model.Note, error)
+	Notes(ctx context.Context) ([]model.Note, error)
 	NoteByID(ctx context.Context, id string) (*model.Note, error)
 }
 
@@ -246,22 +246,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "graph/schema.graphqls", Input: `# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
-
-scalar Time
-
-type Note {
+	{Name: "graph/notes/notes.graphql", Input: `type Note {
     id: ID!
     body: String!
     createTime: Time!
     updateTime: Time!
-}
-
-type Query {
-    notes: [Note!]!
-    noteById(id: ID!): Note
 }
 
 input CreateNotePayload {
@@ -274,6 +263,14 @@ input UpdateNotePayload {
 
 type DeleteNoteResponse {
     success: Boolean!
+}
+
+`, BuiltIn: false},
+	{Name: "graph/schema.graphql", Input: `scalar Time
+
+type Query {
+    notes: [Note!]!
+    noteById(id: ID!): Note
 }
 
 type Mutation {
@@ -739,9 +736,9 @@ func (ec *executionContext) _Query_notes(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Note)
+	res := resTmp.([]model.Note)
 	fc.Result = res
-	return ec.marshalNNote2ᚕᚖentᚑgraphqlᚋgraphᚋmodelᚐNoteᚄ(ctx, field.Selections, res)
+	return ec.marshalNNote2ᚕentᚑgraphqlᚋgraphᚋmodelᚐNoteᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_noteById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -989,6 +986,41 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 	res := resTmp.([]introspection.InputValue)
 	fc.Result = res
 	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "__Directive",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRepeatable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql.CollectedField, obj *introspection.EnumValue) (ret graphql.Marshaler) {
@@ -1943,7 +1975,10 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 func (ec *executionContext) unmarshalInputCreateNotePayload(ctx context.Context, obj interface{}) (model.CreateNotePayload, error) {
 	var it model.CreateNotePayload
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -1963,7 +1998,10 @@ func (ec *executionContext) unmarshalInputCreateNotePayload(ctx context.Context,
 
 func (ec *executionContext) unmarshalInputUpdateNotePayload(ctx context.Context, obj interface{}) (model.UpdateNotePayload, error) {
 	var it model.UpdateNotePayload
-	var asMap = obj.(map[string]interface{})
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
 
 	for k, v := range asMap {
 		switch k {
@@ -2176,6 +2214,11 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			}
 		case "args":
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "isRepeatable":
+			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2435,7 +2478,7 @@ func (ec *executionContext) marshalNNote2entᚑgraphqlᚋgraphᚋmodelᚐNote(ct
 	return ec._Note(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNote2ᚕᚖentᚑgraphqlᚋgraphᚋmodelᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Note) graphql.Marshaler {
+func (ec *executionContext) marshalNNote2ᚕentᚑgraphqlᚋgraphᚋmodelᚐNoteᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Note) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2459,7 +2502,7 @@ func (ec *executionContext) marshalNNote2ᚕᚖentᚑgraphqlᚋgraphᚋmodelᚐN
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNote2ᚖentᚑgraphqlᚋgraphᚋmodelᚐNote(ctx, sel, v[i])
+			ret[i] = ec.marshalNNote2entᚑgraphqlᚋgraphᚋmodelᚐNote(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2469,6 +2512,13 @@ func (ec *executionContext) marshalNNote2ᚕᚖentᚑgraphqlᚋgraphᚋmodelᚐN
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2555,6 +2605,13 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2628,6 +2685,13 @@ func (ec *executionContext) marshalN__DirectiveLocation2ᚕstringᚄ(ctx context
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2677,6 +2741,13 @@ func (ec *executionContext) marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2718,6 +2789,13 @@ func (ec *executionContext) marshalN__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2845,6 +2923,13 @@ func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgq
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2885,6 +2970,13 @@ func (ec *executionContext) marshalO__Field2ᚕgithubᚗcomᚋ99designsᚋgqlgen
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2925,6 +3017,13 @@ func (ec *executionContext) marshalO__InputValue2ᚕgithubᚗcomᚋ99designsᚋg
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 
@@ -2972,6 +3071,13 @@ func (ec *executionContext) marshalO__Type2ᚕgithubᚗcomᚋ99designsᚋgqlgen�
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
 	return ret
 }
 

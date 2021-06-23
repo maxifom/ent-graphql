@@ -1,6 +1,7 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/notes/notes.graphql
+  - graph/schema.graphql
 
 # Where should the generated server code go?
 exec:
@@ -21,13 +22,13 @@ model:
 resolver:
   layout: follow-schema
   dir: graph
-  package: graph
+#  package: graph
 
-# Optional: turn on use `gqlgen:"fieldName"` tags in your models
-# struct_tag: json
+  # Optional: turn on use `gqlgen:"fieldName"` tags in your models
+  # struct_tag: json
 
 # Optional: turn on to use []Thing instead of []*Thing
-# omit_slice_element_pointers: false
+omit_slice_element_pointers: true
 
 # Optional: set to speed up generation time by not performing a final validation pass.
 # skip_validation: true

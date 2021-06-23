@@ -1,0 +1,19 @@
+type Note {
+    id: ID!
+    body: String!
+    createTime: Time!
+    updateTime: Time!
+}
+
+input CreateNotePayload {
+    body: String!
+}
+
+input UpdateNotePayload {
+    body: String!
+}
+
+type DeleteNoteResponse {
+    success: Boolean!
+}
+
