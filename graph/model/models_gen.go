@@ -2,13 +2,25 @@
 
 package model
 
-type NewNote struct {
+import (
+	"time"
+)
+
+type CreateNotePayload struct {
 	Body string `json:"body"`
 }
 
+type DeleteNoteResponse struct {
+	Success bool `json:"success"`
+}
+
 type Note struct {
-	ID         string `json:"id"`
-	Body       string `json:"body"`
-	CreateTime string `json:"createTime"`
-	UpdateTime string `json:"updateTime"`
+	ID         string    `json:"id"`
+	Body       string    `json:"body"`
+	CreateTime time.Time `json:"createTime"`
+	UpdateTime time.Time `json:"updateTime"`
+}
+
+type UpdateNotePayload struct {
+	Body string `json:"body"`
 }

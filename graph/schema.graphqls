@@ -13,13 +13,23 @@ type Note {
 
 type Query {
     notes: [Note!]!
-    noteById: Note
+    noteById(id: ID!): Note
 }
 
-input NewNote {
+input CreateNotePayload {
     body: String!
 }
 
+input UpdateNotePayload {
+    body: String!
+}
+
+type DeleteNoteResponse {
+    success: Boolean!
+}
+
 type Mutation {
-    createNote(input: NewNote!): Note!
+    createNote(input: CreateNotePayload!): Note!
+    updateNote(id: ID!, input: UpdateNotePayload!): Note!
+    deleteNote(id: ID!): DeleteNoteResponse
 }
