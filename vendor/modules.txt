@@ -42,8 +42,6 @@ github.com/99designs/gqlgen/plugin/servergen
 github.com/agnivade/levenshtein
 # github.com/cpuguy83/go-md2man/v2 v2.0.0
 github.com/cpuguy83/go-md2man/v2/md2man
-# github.com/go-chi/chi v3.3.2+incompatible
-## explicit
 # github.com/google/uuid v1.2.0
 github.com/google/uuid
 # github.com/gorilla/websocket v1.4.2

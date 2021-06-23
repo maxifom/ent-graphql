@@ -265,19 +265,22 @@ type DeleteNoteResponse {
     success: Boolean!
 }
 
-`, BuiltIn: false},
-	{Name: "graph/schema.graphql", Input: `scalar Time
-
-type Query {
+extend type Query {
     notes: [Note!]!
     noteById(id: ID!): Note
 }
 
-type Mutation {
+extend type Mutation {
     createNote(input: CreateNotePayload!): Note!
     updateNote(id: ID!, input: UpdateNotePayload!): Note!
     deleteNote(id: ID!): DeleteNoteResponse
 }
+`, BuiltIn: false},
+	{Name: "graph/schema.graphql", Input: `scalar Time
+
+type Query
+
+type Mutation
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

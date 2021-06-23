@@ -1,12 +1,5 @@
 scalar Time
 
-type Query {
-    notes: [Note!]!
-    noteById(id: ID!): Note
-}
+type Query
 
-type Mutation {
-    createNote(input: CreateNotePayload!): Note!
-    updateNote(id: ID!, input: UpdateNotePayload!): Note!
-    deleteNote(id: ID!): DeleteNoteResponse
-}
+type Mutation
